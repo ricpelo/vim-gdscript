@@ -1,1 +1,1 @@
-au BufNewFile,BufRead *.gd setfiletype=gdscript
+au BufNewFile,BufRead *.gd set filetype=gdscript
