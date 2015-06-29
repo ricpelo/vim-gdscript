@@ -14,7 +14,7 @@ let b:did_indent = 1
 setlocal nolisp		" Make sure lisp indenting doesn't supersede us
 setlocal autoindent	" indentexpr isn't much help otherwise
 
-setlocal indentexpr=get_gdscript_indent(v:lnum)
+setlocal indentexpr=GetGdscriptIndent(v:lnum)
 setlocal indentkeys+=<:>,=elif,=except
 
 " Only define the function once.
@@ -28,9 +28,9 @@ set cpo&vim
 
 let s:maxoff = 50	" maximum number of lines to look backwards for ()
 
-function get_gdscript_indent(lnum)
+function GetGdscriptIndent(lnum)
 
-  " If this line is explicitly joined: If the previous line was also joined,
+  " if this line is explicitly joined: if the previous line was also joined,
   " line it up with that one, otherwise add two 'shiftwidth'
   if getline(a:lnum - 1) =~ '\\$'
     if a:lnum > 1 && getline(a:lnum - 2) =~ '\\$'
@@ -39,29 +39,29 @@ function get_gdscript_indent(lnum)
     return indent(a:lnum - 1) + (exists("g:pyindent_continue") ? eval(g:pyindent_continue) : (shiftwidth() * 2))
   endif
 
-  " If the start of the line is in a string don't change the indent.
+  " if the start of the line is in a string don't change the indent.
   if has('syntax_items')
-	\ && synIDattr(synID(a:lnum, 1, 1), "name") =~ "String$"
+	\ && synidattr(synid(a:lnum, 1, 1), "name") =~ "string$"
     return -1
   endif
 
-  " Search backwards for the previous non-empty line.
+  " search backwards for the previous non-empty line.
   let plnum = prevnonblank(v:lnum - 1)
 
   if plnum == 0
-    " This is the first non-empty line, use zero indent.
+    " this is the first non-empty line, use zero indent.
     return 0
   endif
 
-  " If the previous line is inside parenthesis, use the indent of the starting
+  " if the previous line is inside parenthesis, use the indent of the starting
   " line.
-  " Trick: use the non-existing "dummy" variable to break out of the loop when
+  " trick: use the non-existing "dummy" variable to break out of the loop when
   " going too far back.
   call cursor(plnum, 1)
-  let parlnum = searchpair('(\|{\|\[', '', ')\|}\|\]', 'nbW',
+  let parlnum = searchpair('(\|{\|\[', '', ')\|}\|\]', 'nbw',
 	  \ "line('.') < " . (plnum - s:maxoff) . " ? dummy :"
-	  \ . " synIDattr(synID(line('.'), col('.'), 1), 'name')"
-	  \ . " =~ '\\(Comment\\|Todo\\|String\\)$'")
+	  \ . " synidattr(synid(line('.'), col('.'), 1), 'name')"
+	  \ . " =~ '\\(comment\\|todo\\|string\\)$'")
   if parlnum > 0
     let plindent = indent(parlnum)
     let plnumstart = parlnum
@@ -71,23 +71,23 @@ function get_gdscript_indent(lnum)
   endif
 
 
-  " When inside parenthesis: If at the first line below the parenthesis add
+  " when inside parenthesis: if at the first line below the parenthesis add
   " two 'shiftwidth', otherwise same as previous line.
   " i = (a
   "       + b
   "       + c)
   call cursor(a:lnum, 1)
-  let p = searchpair('(\|{\|\[', '', ')\|}\|\]', 'bW',
+  let p = searchpair('(\|{\|\[', '', ')\|}\|\]', 'bw',
 	  \ "line('.') < " . (a:lnum - s:maxoff) . " ? dummy :"
-	  \ . " synIDattr(synID(line('.'), col('.'), 1), 'name')"
-	  \ . " =~ '\\(Comment\\|Todo\\|String\\)$'")
+	  \ . " synidattr(synid(line('.'), col('.'), 1), 'name')"
+	  \ . " =~ '\\(comment\\|todo\\|string\\)$'")
   if p > 0
     if p == plnum
-      " When the start is inside parenthesis, only indent one 'shiftwidth'.
-      let pp = searchpair('(\|{\|\[', '', ')\|}\|\]', 'bW',
+      " when the start is inside parenthesis, only indent one 'shiftwidth'.
+      let pp = searchpair('(\|{\|\[', '', ')\|}\|\]', 'bw',
 	  \ "line('.') < " . (a:lnum - s:maxoff) . " ? dummy :"
-	  \ . " synIDattr(synID(line('.'), col('.'), 1), 'name')"
-	  \ . " =~ '\\(Comment\\|Todo\\|String\\)$'")
+	  \ . " synidattr(synid(line('.'), col('.'), 1), 'name')"
+	  \ . " =~ '\\(comment\\|todo\\|string\\)$'")
       if pp > 0
 	return indent(plnum) + (exists("g:pyindent_nested_paren") ? eval(g:pyindent_nested_paren) : shiftwidth())
       endif
@@ -100,20 +100,20 @@ function get_gdscript_indent(lnum)
   endif
 
 
-  " Get the line and remove a trailing comment.
-  " Use syntax highlighting attributes when possible.
+  " get the line and remove a trailing comment.
+  " use syntax highlighting attributes when possible.
   let pline = getline(plnum)
   let pline_len = strlen(pline)
   if has('syntax_items')
-    " If the last character in the line is a comment, do a binary search for
-    " the start of the comment.  synID() is slow, a linear search would take
+    " if the last character in the line is a comment, do a binary search for
+    " the start of the comment.  synid() is slow, a linear search would take
     " too long on a long line.
-    if synIDattr(synID(plnum, pline_len, 1), "name") =~ "\\(Comment\\|Todo\\)$"
+    if synidattr(synid(plnum, pline_len, 1), "name") =~ "\\(comment\\|todo\\)$"
       let min = 1
       let max = pline_len
       while min < max
 	let col = (min + max) / 2
-	if synIDattr(synID(plnum, col, 1), "name") =~ "\\(Comment\\|Todo\\)$"
+	if synidattr(synid(plnum, col, 1), "name") =~ "\\(comment\\|todo\\)$"
 	  let max = col
 	else
 	  let min = col + 1
@@ -132,23 +132,23 @@ function get_gdscript_indent(lnum)
     endwhile
   endif
 
-  " If the previous line ended with a colon, indent this line
+  " if the previous line ended with a colon, indent this line
   if pline =~ ':\s*$'
     return plindent + shiftwidth()
   endif
 
-  " If the previous line was a stop-execution statement...
+  " if the previous line was a stop-execution statement...
   if getline(plnum) =~ '^\s*\(break\|continue\|raise\|return\|pass\)\>'
-    " See if the user has already dedented
+    " see if the user has already dedented
     if indent(a:lnum) > indent(plnum) - shiftwidth()
-      " If not, recommend one dedent
+      " if not, recommend one dedent
       return indent(plnum) - shiftwidth()
     endif
-    " Otherwise, trust the user
+    " otherwise, trust the user
     return -1
   endif
 
-  " If the current line begins with a keyword that lines up with "try"
+  " if the current line begins with a keyword that lines up with "try"
   if getline(a:lnum) =~ '^\s*\(except\|finally\)\>'
     let lnum = a:lnum - 1
     while lnum >= 1
@@ -164,15 +164,15 @@ function get_gdscript_indent(lnum)
     return -1		" no matching "try"!
   endif
 
-  " If the current line begins with a header keyword, dedent
+  " if the current line begins with a header keyword, dedent
   if getline(a:lnum) =~ '^\s*\(elif\|else\)\>'
 
-    " Unless the previous line was a one-liner
+    " unless the previous line was a one-liner
     if getline(plnumstart) =~ '^\s*\(for\|if\|try\)\>'
       return plindent
     endif
 
-    " Or the user has already dedented
+    " or the user has already dedented
     if indent(a:lnum) <= plindent - shiftwidth()
       return -1
     endif
@@ -180,7 +180,7 @@ function get_gdscript_indent(lnum)
     return plindent - shiftwidth()
   endif
 
-  " When after a () construct we probably want to go back to the start line.
+  " when after a () construct we probably want to go back to the start line.
   " a = (b
   "       + c)
   " here

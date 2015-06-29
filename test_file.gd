@@ -17,5 +17,6 @@ func test_func():
     else:
         while another:
             for i in range(0, 10)
+                pass
                 
 
