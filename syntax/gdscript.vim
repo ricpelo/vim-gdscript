@@ -12,10 +12,10 @@ endif
 " This language is case sensitive
 
 " Keywords
-syn keyword     gdConditional   if elif else true
-syn keyword     gdRepeat        while  for
+syn keyword     gdConditional   if elif else
+syn keyword     gdRepeat        while for
 syn keyword     gdOperator      and or not in extends
-syn keyword     gdStatement     func pass return break continue seed assert true false null
+syn keyword     gdStatement     export func pass return break continue seed assert true false null
 syn keyword     gdType          var const int real bool string
 " syn match       gdInclude   	"^extends"
 
@@ -33,15 +33,19 @@ syn keyword     gdBuiltin       rand randf randi random seed rand_seed deg2rad r
 syn keyword     gdBuiltin       linear2db db2linear max min clamp nearest_po2 weakref
 syn keyword     gdBuiltin       funcref convert typeof str print printt prints printerr
 syn keyword     gdBuiltin       printraw var2str str2var range load inst2dict dict2inst
-syn keyword     gdBuiltin       hash print_stack instance_from_id
+syn keyword     gdBuiltin       hash print_stack instance_from_id float quit get_scene
+syn keyword     gdBuiltin       get_root get_node connect add_to_group remove_child
+syn keyword     gdBuiltin       add_child move_child free set_process has_animation 
+syn keyword     gdBuiltin       play length call_group has_node get_child_count
+syn keyword     gdBuiltin       get_child queue_free _input _ready _process _fixed_process
 
 syn keyword     gdTodo          TODO FIXME XXX NOTE NOTES HACK  contained
 
 syn match       gdComment       "\v#.*$" contains=gdTodo
 
-syn match   gdEscapes   "/\\v\./" contained
+syn match       gdEscapes       "/\\v\./" contained
 " Highlight strings, skipping special characters
-syn region gdString start=/\v"/ end=/\v"/ contains=gdEscapes
+syn region      gdString        start=/\v"/ end=/\v"/ contains=gdEscapes
 
 
 syn match   gdNumber	"\<0[oO]\=\o\+[Ll]\=\>"
@@ -74,6 +78,7 @@ if version >= 508 || !exists("did_gdscript_syn_inits")
     HiLink  gdTodo          ToDo
     HiLink  gdInclude       Include
     HiLink  gdEscapes       Statement
+    HiLink  gdType          Type
 
     delcommand HiLink
 endif
