@@ -43,7 +43,7 @@ syn keyword     gdTodo          TODO FIXME XXX NOTE NOTES HACK  contained
 
 syn match       gdComment       "\v#.*$" contains=gdTodo
 
-syn match       gdEscapes       "/\\v\./" contained
+syn match       gdEscapes       /\v\\./ contained
 " Highlight strings, skipping special characters
 syn region      gdString        start=/\v"/ end=/\v"/ contains=gdEscapes
 
